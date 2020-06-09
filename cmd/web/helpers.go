@@ -1,6 +1,7 @@
 package main
 
 import (
+    "bytes"
     "fmt"
     "net/http"
     "runtime/debug"
@@ -40,8 +41,13 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, name stri
         return
     }
 
-    err := ts.Execute(w, td)
+    // If there is a template runtime error, log a server error instead of returning
+    // a half baked HTML response.
+    buf := new(bytes.Buffer)
+    err := ts.Execute(buf, td)
     if err != nil {
         app.serverError(w, err)
     }
+
+    buf.WriteTo(w)
 }
