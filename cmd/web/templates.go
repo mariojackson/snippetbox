@@ -4,12 +4,22 @@ import (
 	"html/template"
 	"jackson.software/snippetbox/pkg/models"
 	"path/filepath"
+	"time"
 )
 
 type templateData struct {
 	CurrentYear int
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
+}
+
+// Transforms the given date time to a better human readable presentation.
+func humanDate(t time.Time) string {
+	return t.Format("02 Jan 2006 at 15:04")
+}
+
+var functions = template.FuncMap{
+	"humanDate": humanDate,
 }
 
 // NewTemplateCache creates a cache of templates indexed by their page name,
@@ -27,7 +37,7 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 	for _, page := range pages {
 		name := filepath.Base(page)
 
-		ts, err := getTemplateForPage(page, dir)
+		ts, err := getTemplateForPage(name, page, dir)
 		if err != nil {
 			return nil, err
 		}
@@ -42,8 +52,8 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 // by parsing all layout and partial tmpl files which are found in the given directory.
 //
 // GetTemplateForPage returns an error when a file could not be parsed.
-func getTemplateForPage(page, dir string) (*template.Template, error) {
-	ts, err := template.ParseFiles(page)
+func getTemplateForPage(name, page, dir string) (*template.Template, error) {
+	ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 	if err != nil {
 		return nil, err
 	}
