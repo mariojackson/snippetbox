@@ -34,6 +34,7 @@ func main() {
     app := &application{
         errorLog: errorLog,
         infoLog:  infoLog,
+        snippets: &mysql.SnippetRepository{DB: db},
     }
 
     srv := &http.Server{
