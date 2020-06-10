@@ -3,8 +3,8 @@ package main
 import (
 	"database/sql"
 	"flag"
-    "html/template"
-    "log"
+	"html/template"
+	"log"
 	"net/http"
 	"os"
 
@@ -14,9 +14,9 @@ import (
 )
 
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	snippets *mysql.SnippetRepository
+	errorLog      *log.Logger
+	infoLog       *log.Logger
+	snippets      *mysql.SnippetRepository
 	templateCache map[string]*template.Template
 }
 
@@ -40,9 +40,9 @@ func main() {
 	}
 
 	app := &application{
-		errorLog: errorLog,
-		infoLog:  infoLog,
-		snippets: &mysql.SnippetRepository{DB: db},
+		errorLog:      errorLog,
+		infoLog:       infoLog,
+		snippets:      &mysql.SnippetRepository{DB: db},
 		templateCache: templateCache,
 	}
 
