@@ -13,9 +13,9 @@ func (app *application) routes() http.Handler {
 	mux := bone.New()
 
 	mux.Get("/", http.HandlerFunc(app.home)).Options()
-	mux.Get("/snippets/:id", http.HandlerFunc(app.showSnippet))
 	mux.Get("/snippets/create", http.HandlerFunc(app.showSnippetForm))
-	mux.Post("/snippets/create", http.HandlerFunc(app.createSnippet))
+	mux.Get("/snippets/:id", http.HandlerFunc(app.showSnippet))
+	mux.Post("/snippets", http.HandlerFunc(app.createSnippet))
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
