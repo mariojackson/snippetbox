@@ -13,7 +13,7 @@
         </tr>
         {{ range .Snippets }}
         <tr>
-            <td><a href='/snippets?id={{ .ID }}'>{{ .Title }}</a></td>
+            <td><a href='/snippets/{{ .ID }}'>{{ .Title }}</a></td>
             <td>{{ humanDate .Created }}</td>
             <td>#{{ .ID }}</td>
         </tr>
