@@ -2,13 +2,17 @@ package main
 
 import (
 	"html/template"
-	"jackson.software/snippetbox/pkg/models"
+	"net/url"
 	"path/filepath"
 	"time"
+
+	"jackson.software/snippetbox/pkg/models"
 )
 
 type templateData struct {
 	CurrentYear int
+	FormData    url.Values
+	FormErrors  map[string]string
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
 }
