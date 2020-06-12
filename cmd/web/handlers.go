@@ -11,6 +11,7 @@ import (
 	"jackson.software/snippetbox/pkg/models"
 )
 
+// Home handler shows the home page with the latest snippets.
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	s, err := app.snippets.Latest()
 	if err != nil {
@@ -21,6 +22,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "home.page.tmpl", &templateData{Snippets: s})
 }
 
+// ShowSnippet handler shows a specific snippet.
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(bone.GetValue(r, "id"))
 	if err != nil || id < 1 {
@@ -41,12 +43,14 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "show.page.tmpl", &templateData{Snippet: s})
 }
 
+// ShowSnippetForm handler shows a form with fields to create a new snippet.
 func (app *application) showSnippetForm(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "create.page.tmpl", &templateData{
 		Form: forms.New(nil),
 	})
 }
 
+// CreateSnippet handler creates a new snippet.
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
