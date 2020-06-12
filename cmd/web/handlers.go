@@ -40,7 +40,12 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, r, "show.page.tmpl", &templateData{Snippet: s})
+	flash := app.session.PopString(r, "flash")
+
+	app.render(w, r, "show.page.tmpl", &templateData{
+		Snippet: s,
+		Flash:   flash,
+	})
 }
 
 // ShowSnippetForm handler shows a form with fields to create a new snippet.
@@ -73,6 +78,8 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
+
+	app.session.Put(r, "flash", "Your Snippet was successfully created")
 
 	http.Redirect(w, r, fmt.Sprintf("/snippets/%d", id), http.StatusSeeOther)
 }
