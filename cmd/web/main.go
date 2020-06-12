@@ -24,6 +24,7 @@ type application struct {
 	session       *sessions.Session
 	snippets      *mysql.SnippetRepository
 	templateCache map[string]*template.Template
+	users         *mysql.UserRepository
 }
 
 func main() {
@@ -39,6 +40,7 @@ func main() {
 	if err != nil {
 		errorLog.Fatal(err)
 	}
+	infoLog.Println("Successfully connected to database")
 	defer db.Close()
 
 	templateCache, err := newTemplateCache("./ui/html")
@@ -56,6 +58,7 @@ func main() {
 		session:       session,
 		snippets:      &mysql.SnippetRepository{DB: db},
 		templateCache: templateCache,
+		users:         &mysql.UserRepository{DB: db},
 	}
 
 	tlsConfig := &tls.Config{
