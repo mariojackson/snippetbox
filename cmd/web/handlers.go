@@ -40,12 +40,7 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flash := app.session.PopString(r, "flash")
-
-	app.render(w, r, "show.page.tmpl", &templateData{
-		Snippet: s,
-		Flash:   flash,
-	})
+	app.render(w, r, "show.page.tmpl", &templateData{Snippet: s})
 }
 
 // ShowSnippetForm handler shows a form with fields to create a new snippet.
