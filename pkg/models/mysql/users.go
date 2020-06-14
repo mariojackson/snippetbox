@@ -44,7 +44,31 @@ func (m *UserRepository) Insert(name, email, password string) error {
 // Authenticate authenticates a user. If the authentication was not successfull,
 // an error will be returned.
 func (m *UserRepository) Authenticate(email, password string) (int, error) {
-	return 0, nil
+    var id int
+    var hashedPassword []byte
+
+    stmt := "SELECT id, hashed_password FROM users WHERE email = ? AND active = TRUE"
+    row := m.DB.QueryRow(stmt, email)
+    err := row.Scan(&id, &hashedPassword)
+
+    if err != nil {
+        if errors.Is(err, sql.ErrNoRows) {
+            return 0, models.ErrInvalidCredentials
+        } else {
+            return 0, err
+        }
+    }
+
+    err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
+    if err != nil {
+        if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+            return 0, models.ErrInvalidCredentials
+        } else {
+            return 0, err
+        }
+    }
+
+    return id, nil
 }
 
 // Get gets a user found by the given ID. If no user could be found by
