@@ -15,14 +15,19 @@
         <nav>
             <div>
                 <a href='/'>Home</a>
-                <a href='/snippets/create'>Create Snippet</a>
+                {{ if .IsAuthenticated }}
+                    <a href='/snippets/create'>Create Snippet</a>
+                {{ end }}
             </div>
             <div>
-                <a href='/users/signup'>Signup</a>
-                <a href='/users/login'>Login</a>
-                <form action='/users/logout' method='POST'>
-                    <button>Logout</button>
-                </form>
+                {{ if .IsAuthenticated }}
+                    <form action='/users/logout' method='POST'>
+                        <button>Logout</button>
+                    </form>
+                {{ else }}
+                    <a href='/users/signup'>Signup</a>
+                    <a href='/users/login'>Login</a>
+                {{ end }}
             </div>
         </nav>
         <main>
