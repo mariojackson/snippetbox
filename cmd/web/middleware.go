@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/justinas/nosurf"
 )
 
 // SecureHeaders adds extra header to every request in order to add security.
@@ -40,6 +42,9 @@ func (app *application) recoverPanic(next http.Handler) http.Handler {
 	})
 }
 
+// RequireAuthentication checks if the request comes from a user who is logged in.
+// If the request comes from a non-logged in user, the user will be redirectected
+// to the login page.
 func (app *application) requireAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !app.isAuthenticated(r) {
@@ -52,4 +57,17 @@ func (app *application) requireAuthentication(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// CSRF middleware which checks for a valid CSRF token in order
+// for a form submit to be handled correctly.
+func noSurf(next http.Handler) http.Handler {
+	csrfHandler := nosurf.New(next)
+	csrfHandler.SetBaseCookie(http.Cookie{
+		HttpOnly: true,
+		Path:     "/",
+		Secure:   true,
+	})
+
+	return csrfHandler
 }
