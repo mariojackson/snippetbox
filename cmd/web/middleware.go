@@ -1,8 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+    "context"
+    "errors"
+    "fmt"
+    "jackson.software/snippetbox/pkg/models"
+    "net/http"
 
 	"github.com/justinas/nosurf"
 )
@@ -43,7 +46,7 @@ func (app *application) recoverPanic(next http.Handler) http.Handler {
 }
 
 // RequireAuthentication checks if the request comes from a user who is logged in.
-// If the request comes from a non-logged in user, the user will be redirectected
+// If the request comes from a non-logged in user, the user will be redirected
 // to the login page.
 func (app *application) requireAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -70,4 +73,32 @@ func noSurf(next http.Handler) http.Handler {
 	})
 
 	return csrfHandler
+}
+
+// Checks the request is coming from an authenticated and active user.
+// If the user is authenticated and active, a new copy of the request
+// will be created and a key will be added to the request context,
+// confirming that the request is coming from a valid user.
+func (app *application) authenticate(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        exists := app.session.Exists(r, "authenticatedUserID")
+        if !exists {
+            next.ServeHTTP(w, r)
+            return
+        }
+
+        // user is not valid (might have been removed etc.)
+        user, err := app.users.Get(app.session.GetInt(r, "authenticatedUserID"))
+        if errors.Is(err, models.ErrNoRecord) || !user.Active {
+            app.session.Remove(r, "authenticatedUserID")
+            next.ServeHTTP(w, r)
+            return
+        } else if err != nil {
+            app.serverError(w, err)
+            return
+        }
+
+        ctx := context.WithValue(r.Context(), contextKeyIsAuthenticated, true)
+        next.ServeHTTP(w, r.WithContext(ctx))
+    })
 }

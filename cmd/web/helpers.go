@@ -70,7 +70,11 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, name stri
 }
 
 // IsAuthenticated returns true if the request was made by an authenticated user.
-// A user is authenticated, if a session exists with the user ID.
 func (app *application) isAuthenticated(r *http.Request) bool {
-	return app.session.Exists(r, "authenticatedUserID")
+    isAuthenticated, ok := r.Context().Value(contextKeyIsAuthenticated).(bool)
+    if !ok {
+        return false
+    }
+
+    return isAuthenticated
 }

@@ -16,6 +16,10 @@ import (
 	"github.com/golangcollege/sessions"
 )
 
+type contextKey string
+
+const contextKeyIsAuthenticated = contextKey("isAuthenticated")
+
 // Application struct holds application specific dependencies, so that
 // they are accessable across the whole application.
 type application struct {
